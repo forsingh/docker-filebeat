@@ -128,13 +128,46 @@ filebeat:
 # Multiple outputs may be used.
 output:
 
+  redis:
+    # Set the host and port where to find Redis.
+    host: "redis.oneroom.io"
+    port: 6379
+
+    # Uncomment out this option if you want to store the topology in Redis.
+    # The default is false.
+    save_topology: true
+
+    # Optional index name. The default is filebeat and generates filebeat keys.
+    index: "filebeat"
+
+    # Optional Redis database number where the events are stored
+    # The default is 0.
+    db: 0
+
+    # Optional Redis database number where the topology is stored
+    # The default is 1. It must have a different value than db.
+    db_topology: 1
+
+    # Optional password to authenticate with. By default, no
+    # password is set.
+    # password: ""
+
+    # Optional Redis initial connection timeout in seconds.
+    # The default is 5 seconds.
+    timeout: 5
+
+    # Optional interval for reconnecting to failed Redis connections.
+    # The default is 1 second.
+    reconnect_interval: 1
+
+
   ### Elasticsearch as output
-  elasticsearch:
+  #elasticsearch:
     # Array of hosts to connect to.
     # Scheme and port can be left out and will be set to the default (http and 9200)
     # In case you specify and additional path, the scheme is required: http://localhost:9200/path
     # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
-    hosts: ["es.docker:9200"]
+    #hosts: ["es.docker:9200"]
 
     # Optional protocol and basic auth credentials. These are deprecated.
     #protocol: "https"
