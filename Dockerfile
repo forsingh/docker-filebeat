@@ -1,17 +1,25 @@
 FROM debian:jessie
 
-ENV FILEBEAT_VERSION 1.0.0
-ENV FILEBEAT_SHA1 824c0b3dce16e3efd7b72b5799e97cc865951ade
+MAINTAINER Andrea Usuelli <andrea.usuelli@prima.it>
 
-RUN apt-get -y update
-RUN apt-get -y install apt-transport-https
-RUN apt-get -y install curl
-RUN curl https://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -
-RUN echo "deb https://packages.elastic.co/beats/apt stable main" | tee -a /etc/apt/sources.list.d/beats.list
+ENV FILEBEAT_VERSION=5.1.1 \
+    FILEBEAT_SHA1=6e629825010b816b627ac531ddbb50b960bbbcba
 
-RUN apt-get -y update
-RUN apt-get -y install filebeat
+RUN set -x && \
+  apt-get update && \
+  apt-get install -y wget && \
+  wget https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${FILEBEAT_VERSION}-linux-x86_64.tar.gz -O /opt/filebeat.tar.gz && \
+  cd /opt && \
+  echo "${FILEBEAT_SHA1}  filebeat.tar.gz" | sha1sum -c - && \
+  tar xzvf filebeat.tar.gz && \
+  cd filebeat-* && \
+  cp filebeat /bin && \
+  cd /opt && \
+  rm -rf filebeat* && \
+  apt-get purge -y wget && \
+  apt-get autoremove -y && \
+  apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-ADD filebeat.yml /etc/filebeat/filebeat.yml
-
-ENTRYPOINT ["/usr/bin/filebeat", "-e", "-v", "-c", "/etc/filebeat/filebeat.yml"]
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD [ "filebeat", "-e" ]
